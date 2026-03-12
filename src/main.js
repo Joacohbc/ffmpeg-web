@@ -4,6 +4,40 @@ import { fetchFile } from '@ffmpeg/util';
 
 let ffmpeg = null;
 let selectedFile = null;
+
+// Toast Notification System
+function showMessage(msg, type = 'error') {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+
+    const toast = document.createElement('div');
+    toast.className = `px-4 py-3 rounded-lg shadow-lg text-white text-sm flex items-center justify-between transition-all duration-300 transform translate-x-0 opacity-100 ${
+        type === 'error' ? 'bg-red-600' : 'bg-green-600'
+    }`;
+
+    toast.innerHTML = `
+        <span>${msg}</span>
+        <button class="ml-4 text-white hover:text-gray-200 focus:outline-none">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+    `;
+
+    // Close button event
+    toast.querySelector('button').addEventListener('click', () => {
+        toast.classList.add('opacity-0', 'translate-x-full');
+        setTimeout(() => toast.remove(), 300);
+    });
+
+    container.appendChild(toast);
+
+    // Auto remove after 5s
+    setTimeout(() => {
+        if (container.contains(toast)) {
+            toast.classList.add('opacity-0', 'translate-x-full');
+            setTimeout(() => toast.remove(), 300);
+        }
+    }, 5000);
+}
 let isConverting = false;
 
 // DOM Elements
@@ -60,7 +94,7 @@ const initFFmpeg = async () => {
         console.log('FFmpeg loaded successfully');
     } catch (error) {
         console.error('Error loading FFmpeg:', error);
-        alert('Error al cargar el motor de conversión. Asegúrate de estar usando un navegador compatible y que los headers del servidor estén correctos.');
+        showMessage('Error al cargar el motor de conversión. Asegúrate de estar usando un navegador compatible y que los headers del servidor estén correctos.', 'error');
     } finally {
         initialLoading.classList.add('hidden');
     }
@@ -142,6 +176,30 @@ function handleFileSelect(file) {
         outputFormat.value = targetFormat;
     }
     
+    // Update UI based on type
+    const optgroupVideo = outputFormat.querySelector('optgroup[label="Video"]');
+    const qPresetOptions = qualityPreset.options;
+
+    if (isAudio) {
+        if (optgroupVideo) optgroupVideo.style.display = 'none';
+
+        qPresetOptions[0].text = "Alta (320kbps)";
+        qPresetOptions[1].text = "Media (192kbps)";
+        qPresetOptions[2].text = "Baja (96kbps)";
+
+        customResolution.parentElement.classList.add('hidden');
+        customVBitrate.parentElement.classList.add('hidden');
+    } else {
+        if (optgroupVideo) optgroupVideo.style.display = '';
+
+        qPresetOptions[0].text = "Alta (Original o similar)";
+        qPresetOptions[1].text = "Media (Equilibrado)";
+        qPresetOptions[2].text = "Baja (Menor peso)";
+
+        customResolution.parentElement.classList.remove('hidden');
+        customVBitrate.parentElement.classList.remove('hidden');
+    }
+
     // Update UI
     fileNameEl.innerText = file.name;
     fileSizeEl.innerText = formatBytes(file.size);
@@ -222,6 +280,10 @@ async function startConversion() {
             // Format specific tweaks (WebM needs specific codecs usually)
             if (format === 'webm') {
                 args.push('-c:v', 'libvpx-vp9', '-c:a', 'libopus');
+            } else if (format === 'mp4' || format === 'mkv') {
+                args.push('-c:v', 'libx264', '-c:a', 'aac');
+            } else if (format === 'avi') {
+                args.push('-c:v', 'mpeg4', '-c:a', 'mp3');
             }
             
         } else {
@@ -240,6 +302,17 @@ async function startConversion() {
                 if (ab) {
                     args.push('-b:a', ab);
                 }
+            }
+
+            // Audio format codecs
+            if (format === 'mp3') {
+                args.push('-c:a', 'libmp3lame');
+            } else if (format === 'wav') {
+                args.push('-c:a', 'pcm_s16le');
+            } else if (format === 'aac') {
+                args.push('-c:a', 'aac');
+            } else if (format === 'ogg') {
+                args.push('-c:a', 'libvorbis');
             }
         }
         
@@ -281,7 +354,7 @@ async function startConversion() {
         
     } catch (error) {
         console.error('Error during conversion:', error);
-        alert(`Ocurrió un error: ${error.message}`);
+        showMessage(`Ocurrió un error: ${error.message}`, 'error');
         
         // Reset UI on error
         progressContainer.classList.add('hidden');
