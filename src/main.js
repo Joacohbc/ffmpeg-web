@@ -183,18 +183,20 @@ function handleFileSelect(file) {
     if (isAudio) {
         if (optgroupVideo) optgroupVideo.style.display = 'none';
 
-        qPresetOptions[0].text = "Alta (320kbps)";
-        qPresetOptions[1].text = "Media (192kbps)";
-        qPresetOptions[2].text = "Baja (96kbps)";
+        qPresetOptions[0].text = "Mantener original";
+        qPresetOptions[1].text = "Alta (320kbps)";
+        qPresetOptions[2].text = "Media (192kbps)";
+        qPresetOptions[3].text = "Baja (96kbps)";
 
         customResolution.parentElement.classList.add('hidden');
         customVBitrate.parentElement.classList.add('hidden');
     } else {
         if (optgroupVideo) optgroupVideo.style.display = '';
 
-        qPresetOptions[0].text = "Alta (Original o similar)";
-        qPresetOptions[1].text = "Media (Equilibrado)";
-        qPresetOptions[2].text = "Baja (Menor peso)";
+        qPresetOptions[0].text = "Mantener original";
+        qPresetOptions[1].text = "Alta (Original o similar)";
+        qPresetOptions[2].text = "Media (Equilibrado)";
+        qPresetOptions[3].text = "Baja (Menor peso)";
 
         customResolution.parentElement.classList.remove('hidden');
         customVBitrate.parentElement.classList.remove('hidden');
@@ -251,7 +253,10 @@ async function startConversion() {
         // Quality / Downgrade logic
         if (!isOutputAudio) {
             // Video downgrade logic
-            if (preset === 'high') {
+            if (preset === 'keep') {
+                // Do not add quality flags, keep as close to original as possible.
+                // We'll rely on format defaults or copy streams if possible.
+            } else if (preset === 'high') {
                 args.push('-preset', 'fast', '-crf', '18');
             } else if (preset === 'medium') {
                 args.push('-preset', 'medium', '-crf', '24');
@@ -291,7 +296,9 @@ async function startConversion() {
             // If extracting from video, we just process audio
             args.push('-vn'); // No video
             
-            if (preset === 'high') {
+            if (preset === 'keep') {
+                // Do nothing for audio quality flags.
+            } else if (preset === 'high') {
                 args.push('-b:a', '320k');
             } else if (preset === 'medium') {
                 args.push('-b:a', '192k');
