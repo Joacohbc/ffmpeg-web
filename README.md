@@ -28,7 +28,7 @@
 * **Nombre de salida editable:** por defecto el nombre original; podés cambiarlo por archivo.
 * **Validación robusta:** rechaza archivos no multimedia, avisa por archivos muy grandes, valida el tamaño objetivo según la duración, detecta combinaciones incompatibles y compara el peso **antes/después** mostrando el % ahorrado.
 * **Instalación con consentimiento:** el motor FFmpeg (~32 MB) se descarga solo cuando lo aceptás, con barra de progreso, y queda **en caché** para próximos usos. Botón de **Limpiar caché** siempre visible.
-* **Interfaz Intuitiva:** Arrastra y suelta tus archivos (*Drag & Drop*) en un diseño moderno, oscuro y minimalista.
+* **Interfaz Intuitiva:** Arrastra y suelta tus archivos (*Drag & Drop*) en un diseño minimalista y responsive, con **modo claro y oscuro** (respeta la preferencia del sistema, con toggle) e iconos SVG (Lucide).
 
 ## 🚀 Desarrollo
 
