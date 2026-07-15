@@ -1,90 +1,105 @@
 <!doctype html>
-<html lang="es" class="dark">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Media Converter - FFmpeg.wasm Local</title>
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#09090b" media="(prefers-color-scheme: dark)" />
+    <title>Media Converter — local, privado, rápido</title>
+    <script>
+      // Aplica el tema antes de pintar para evitar parpadeo.
+      (() => {
+        const t = localStorage.getItem('theme');
+        const dark = t ? t === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+        if (dark) document.documentElement.classList.add('dark');
+      })();
+    </script>
   </head>
-  <body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col items-center p-4 sm:p-6">
+  <body>
+    <main class="mx-auto w-full max-w-2xl px-4 py-8 sm:px-6 sm:py-14">
 
-    <div class="max-w-3xl w-full">
       <!-- Header -->
-      <header class="flex items-center justify-between mb-6 gap-4">
-        <div>
-          <h1 class="text-2xl sm:text-3xl font-bold text-white">Media Converter Local</h1>
-          <p class="text-gray-400 text-sm">Convertí y comprimí audio/video 100% en tu navegador</p>
-        </div>
-        <button id="btn-clear-cache" title="Borra el motor FFmpeg descargado"
-          class="flex-shrink-0 text-xs sm:text-sm bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 px-3 py-2 rounded-lg transition-colors flex items-center gap-2">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-          <span>Limpiar caché</span>
-          <span id="cache-size" class="text-gray-500"></span>
-        </button>
-      </header>
-
-      <!-- Gate de instalación de FFmpeg -->
-      <div id="install-gate" class="hidden bg-gray-800 rounded-2xl shadow-2xl p-8 border border-gray-700 text-center">
-        <svg class="w-14 h-14 text-blue-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-        <h2 class="text-xl font-bold text-white mb-2">Instalar el motor de conversión</h2>
-        <p class="text-gray-400 mb-1">Esta app usa <strong>FFmpeg.wasm</strong>, que corre 100% local en tu navegador.</p>
-        <p class="text-gray-400 mb-6">Se descargará una única vez (<strong id="install-size">≈ 32 MB</strong>) y quedará en caché para próximos usos.</p>
-
-        <div id="install-progress" class="hidden mb-6">
-          <p id="install-progress-text" class="text-sm text-blue-400 mb-2">Descargando... 0%</p>
-          <div class="w-full bg-gray-700 rounded-full h-2.5 overflow-hidden">
-            <div id="install-progress-bar" class="bg-blue-500 h-2.5 rounded-full transition-all" style="width:0%"></div>
+      <header class="flex items-center justify-between gap-4 mb-10">
+        <div class="flex items-center gap-3 min-w-0">
+          <img src="/icon.svg" alt="" class="w-9 h-9 rounded-xl flex-shrink-0" />
+          <div class="min-w-0">
+            <h1 class="text-lg font-semibold tracking-tight truncate">Media Converter</h1>
+            <p class="text-xs text-muted">Local, privado y rápido</p>
           </div>
         </div>
+        <div class="flex items-center gap-1.5 flex-shrink-0">
+          <button id="btn-theme" class="btn-icon" title="Cambiar tema" aria-label="Cambiar tema">
+            <span data-icon="sun" data-icon-dark="moon"></span>
+          </button>
+          <button id="btn-clear-cache" class="btn-ghost btn text-xs" title="Borra el motor FFmpeg descargado">
+            <span data-icon="trash"></span>
+            <span class="hidden sm:inline">Limpiar caché</span>
+            <span id="cache-size" class="text-muted"></span>
+          </button>
+        </div>
+      </header>
 
-        <button id="btn-install" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-colors">
-          Descargar e instalar
+      <!-- Gate de instalación -->
+      <section id="install-gate" class="hidden surface p-8 text-center">
+        <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl mb-5" style="background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent);">
+          <span data-icon="install" data-icon-cls="icon-lg"></span>
+        </div>
+        <h2 class="text-base font-semibold mb-2">Instalar el motor de conversión</h2>
+        <p class="text-sm text-muted mb-1">Usa <strong class="text-accent">FFmpeg.wasm</strong>, que corre 100% en tu navegador.</p>
+        <p class="text-sm text-muted mb-6">Se descarga una sola vez (<strong id="install-size">≈ 32 MB</strong>) y queda en caché.</p>
+
+        <div id="install-progress" class="hidden mb-6 text-left">
+          <div class="flex justify-between text-xs text-muted mb-1.5">
+            <span id="install-progress-text">Descargando…</span>
+            <span id="install-progress-pct">0%</span>
+          </div>
+          <div class="track h-1.5"><div id="install-progress-bar" class="bar" style="width:0%"></div></div>
+        </div>
+
+        <button id="btn-install" class="btn btn-primary">
+          <span data-icon="download"></span> Descargar e instalar
         </button>
-      </div>
+      </section>
 
-      <!-- App principal -->
-      <div id="app" class="hidden bg-gray-800 rounded-2xl shadow-2xl p-6 sm:p-8 border border-gray-700">
+      <!-- App -->
+      <section id="app" class="hidden">
 
-        <!-- Selector de modo -->
-        <div class="grid grid-cols-3 gap-2 mb-6 bg-gray-900 p-1.5 rounded-xl">
-          <button data-mode="compress" class="mode-btn px-2 py-2.5 rounded-lg text-sm font-medium transition-colors">
-            <span class="block text-base">🗜️</span>Comprimir
-          </button>
-          <button data-mode="convert" class="mode-btn px-2 py-2.5 rounded-lg text-sm font-medium transition-colors">
-            <span class="block text-base">🔄</span>Convertir
-          </button>
-          <button data-mode="extract" class="mode-btn px-2 py-2.5 rounded-lg text-sm font-medium transition-colors">
-            <span class="block text-base">🎵</span>Extraer audio
-          </button>
+        <!-- Modos -->
+        <div class="seg mb-4" role="tablist">
+          <button data-mode="compress" class="seg-item" role="tab"><span data-icon="shrink"></span> Comprimir</button>
+          <button data-mode="convert" class="seg-item" role="tab"><span data-icon="repeat"></span> Convertir</button>
+          <button data-mode="extract" class="seg-item" role="tab"><span data-icon="audio"></span> Extraer audio</button>
         </div>
-        <p id="mode-desc" class="text-sm text-gray-400 mb-6 text-center"></p>
+        <p id="mode-desc" class="text-sm text-muted mb-6"></p>
 
-        <!-- Zona Drag & Drop -->
-        <div id="drop-zone" class="border-2 border-dashed border-gray-600 rounded-xl p-8 flex flex-col items-center justify-center text-center cursor-pointer hover:border-blue-500 hover:bg-gray-700/40 transition-colors">
-          <svg class="w-10 h-10 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
-          <p class="text-base font-medium text-gray-300">Arrastrá tus archivos aquí</p>
-          <p class="text-sm text-gray-500 mt-1">o hacé clic para seleccionar (podés elegir varios)</p>
+        <!-- Drop zone -->
+        <label id="drop-zone" class="dropzone flex flex-col items-center justify-center text-center p-8 sm:p-10">
+          <span data-icon="upload" data-icon-cls="icon-lg" class="text-muted mb-3"></span>
+          <p class="text-sm font-medium">Arrastrá tus archivos o hacé clic</p>
+          <p class="text-xs text-muted mt-1">Podés seleccionar varios a la vez</p>
           <input type="file" id="file-input" class="hidden" multiple />
-        </div>
+        </label>
 
-        <!-- Opciones de conversión -->
-        <div id="options" class="hidden mt-6 space-y-5">
+        <!-- Opciones -->
+        <div id="options" class="hidden mt-6 surface p-4 sm:p-5 space-y-5">
 
           <!-- COMPRIMIR -->
           <div data-panel="compress" class="mode-panel hidden space-y-4">
-            <div class="flex gap-2">
-              <label class="flex-1 cursor-pointer">
+            <div class="grid grid-cols-2 gap-2">
+              <label class="cursor-pointer">
                 <input type="radio" name="compress-method" value="quality" class="peer sr-only" checked>
-                <div class="peer-checked:border-blue-500 peer-checked:bg-blue-500/10 border border-gray-600 rounded-lg px-3 py-2 text-center text-sm">Por calidad</div>
+                <div class="btn btn-ghost w-full peer-checked:!border-[var(--accent)] peer-checked:text-accent">Por calidad</div>
               </label>
-              <label class="flex-1 cursor-pointer">
+              <label class="cursor-pointer">
                 <input type="radio" name="compress-method" value="targetsize" class="peer sr-only">
-                <div class="peer-checked:border-blue-500 peer-checked:bg-blue-500/10 border border-gray-600 rounded-lg px-3 py-2 text-center text-sm">Tamaño objetivo</div>
+                <div class="btn btn-ghost w-full peer-checked:!border-[var(--accent)] peer-checked:text-accent">Tamaño objetivo</div>
               </label>
             </div>
 
             <div id="compress-quality-wrap" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label class="block text-sm font-medium text-gray-300 mb-1">Calidad</label>
+                <label class="label">Calidad</label>
                 <select id="compress-quality" class="input">
                   <option value="high">Alta (poca pérdida)</option>
                   <option value="medium" selected>Media (recomendado)</option>
@@ -92,7 +107,7 @@
                 </select>
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-300 mb-1">Reducir resolución</label>
+                <label class="label">Reducir resolución</label>
                 <select id="compress-resolution" class="input">
                   <option value="">Mantener original</option>
                   <option value="1080">1080p</option>
@@ -103,9 +118,9 @@
             </div>
 
             <div id="compress-target-wrap" class="hidden">
-              <label class="block text-sm font-medium text-gray-300 mb-1">Tamaño objetivo (MB)</label>
+              <label class="label">Tamaño objetivo (MB)</label>
               <input type="number" id="compress-target" min="1" step="1" placeholder="Ej: 10" class="input">
-              <p class="text-xs text-gray-500 mt-1">Se calcula el bitrate para acercarse a ese peso.</p>
+              <p class="text-xs text-muted mt-1">Se calcula el bitrate para acercarse a ese peso.</p>
             </div>
           </div>
 
@@ -113,7 +128,7 @@
           <div data-panel="convert" class="mode-panel hidden space-y-4">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label class="block text-sm font-medium text-gray-300 mb-1">Formato de salida</label>
+                <label class="label">Formato de salida</label>
                 <select id="convert-format" class="input">
                   <optgroup label="Video">
                     <option value="mp4">MP4</option>
@@ -130,7 +145,7 @@
                 </select>
               </div>
               <div id="convert-quality-wrap">
-                <label class="block text-sm font-medium text-gray-300 mb-1">Calidad (si re-encodea)</label>
+                <label class="label">Calidad (si re-encodea)</label>
                 <select id="convert-quality" class="input">
                   <option value="high">Alta</option>
                   <option value="medium" selected>Media</option>
@@ -138,16 +153,16 @@
                 </select>
               </div>
             </div>
-            <label class="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
-              <input type="checkbox" id="convert-lossless" checked class="w-4 h-4 rounded">
-              Sin pérdida si es posible (copiar sin recodificar — instantáneo)
+            <label class="flex items-center gap-2 text-sm cursor-pointer select-none">
+              <input type="checkbox" id="convert-lossless" checked class="accent-[var(--accent)] w-4 h-4">
+              Sin pérdida si es posible <span class="text-muted">(copia sin recodificar)</span>
             </label>
           </div>
 
           <!-- EXTRAER AUDIO -->
           <div data-panel="extract" class="mode-panel hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-300 mb-1">Formato de audio</label>
+              <label class="label">Formato de audio</label>
               <select id="extract-format" class="input">
                 <option value="mp3">MP3</option>
                 <option value="aac">AAC</option>
@@ -156,7 +171,7 @@
               </select>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-300 mb-1">Bitrate</label>
+              <label class="label">Bitrate</label>
               <select id="extract-bitrate" class="input">
                 <option value="320">320 kbps (alta)</option>
                 <option value="192" selected>192 kbps</option>
@@ -165,31 +180,34 @@
             </div>
           </div>
 
-          <!-- Concurrencia (solo batch) -->
-          <div id="concurrency-wrap" class="hidden">
-            <label class="block text-sm font-medium text-gray-300 mb-1">Archivos en paralelo</label>
-            <select id="concurrency" class="input sm:w-48">
+          <!-- Concurrencia -->
+          <div id="concurrency-wrap" class="hidden divider pt-4">
+            <label class="label">Archivos en paralelo</label>
+            <select id="concurrency" class="input sm:max-w-xs">
               <option value="1" selected>1 (secuencial)</option>
               <option value="2">2 (más rápido, más RAM)</option>
               <option value="3">3 (máximo uso de RAM)</option>
             </select>
-            <p class="text-xs text-gray-500 mt-1">Cada archivo en paralelo usa memoria extra.</p>
           </div>
 
-          <button id="btn-convert" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors">
-            Convertir
+          <button id="btn-convert" class="btn btn-primary w-full">
+            <span data-icon="repeat"></span> Convertir
           </button>
         </div>
 
         <!-- Lista de archivos -->
-        <div id="file-list" class="mt-6 space-y-3"></div>
-      </div>
-    </div>
+        <div id="file-list" class="mt-4 space-y-2.5"></div>
+      </section>
+
+      <footer class="text-center text-xs text-muted mt-12">
+        Tus archivos nunca salen de tu dispositivo.
+      </footer>
+    </main>
 
     <!-- Toasts -->
-    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2 max-w-sm"></div>
+    <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 w-[calc(100%-2rem)] max-w-sm"></div>
 
-    <!-- Habilita cross-origin isolation (SharedArrayBuffer) en hosts sin headers COOP/COEP (ej. GitHub Pages) -->
+    <!-- Habilita cross-origin isolation en hosts sin headers COOP/COEP (GitHub Pages) -->
     <script src="/coi-serviceworker.js"></script>
     <script type="module" src="/src/main.js"></script>
   </body>
