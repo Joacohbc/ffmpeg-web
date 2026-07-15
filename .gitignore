@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# Assets del core de FFmpeg copiados por scripts/copy-core.mjs
+public/ffmpeg/
+public/coi-serviceworker.js
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
