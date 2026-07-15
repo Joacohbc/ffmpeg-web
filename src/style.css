@@ -5,8 +5,26 @@
   --color-primary-600: #2563eb;
   --color-dark-800: #1f2937;
   --color-dark-900: #111827;
+  --color-gray-750: #283141;
 }
 
 body {
-  @apply bg-gray-900 text-gray-100 min-h-screen flex flex-col font-sans;
+  @apply bg-gray-900 text-gray-100 min-h-screen font-sans;
+}
+
+/* Inputs y selects reutilizables */
+.input {
+  @apply w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500;
+}
+
+.input-invalid {
+  @apply border-red-500 ring-1 ring-red-500;
+}
+
+/* Botones de modo (segmented control) */
+.mode-btn {
+  @apply text-gray-400 hover:text-gray-200;
+}
+.mode-btn.active {
+  @apply bg-blue-600 text-white shadow;
 }
