@@ -1,47 +1,86 @@
 <div align="center">
 
-# Media Converter Local
+# 🎬 Media Converter Local
 
-**La forma más rápida y privada de convertir tus archivos multimedia.** Convierte formatos de video y audio de forma 100% local directamente en tu navegador. Utilizando la potencia de WebAssembly, tus archivos nunca abandonan tu dispositivo: cero servidores externos, cero tiempos de subida y con total privacidad garantizada.
+**La forma más rápida, segura y privada de convertir tus archivos multimedia.**
+
+Convierte, comprime y extrae audio de tus videos de forma **100% local** directamente en tu navegador. Gracias a **WebAssembly (`FFmpeg.wasm`)**, tus archivos **nunca abandonan tu dispositivo**: cero servidores externos, cero tiempos de subida y con total privacidad garantizada.
+
+---
 
 </div>
 
-<br>
-
-## 🛠 Built With
-
-[![HTML](https://img.shields.io/badge/HTML-%23E34F26.svg?logo=html5&logoColor=white)](#)
-[![CSS](https://img.shields.io/badge/CSS-639?logo=css&logoColor=fff)](#)
-[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=000)](#)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-%2338B2AC.svg?logo=tailwind-css&logoColor=white)](#)
-[![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=fff)](#)
-[![FFmpeg](https://img.shields.io/badge/FFmpeg-5CBE43?logo=ffmpeg&logoColor=white)](#)
-
 ## ✨ Características Principales
 
-* **Procesamiento en el Cliente:** Todo ocurre en la memoria de tu navegador, garantizando la privacidad de tus datos.
-* **Tres modos claros:**
-  * 🗜️ **Comprimir** — bajá el peso sin perder mucha calidad (por nivel de calidad CRF o apuntando a un **tamaño objetivo** en MB), con opción de reducir la resolución.
-  * 🔄 **Convertir** — cambiá de formato de video (MP4, WebM, MKV, AVI) o audio (MP3, WAV, AAC, OGG), con opción **sin pérdida** (copia de streams, instantánea) cuando los códecs son compatibles.
-  * 🎵 **Extraer audio** — obtené la pista de audio de un video en el formato y bitrate que elijas.
-* **Procesamiento por lotes:** subí varios archivos a la vez y procesalos en cola, con concurrencia configurable (1–3 en paralelo).
-* **Nombre de salida editable:** por defecto el nombre original; podés cambiarlo por archivo.
-* **Validación robusta:** rechaza archivos no multimedia, avisa por archivos muy grandes, valida el tamaño objetivo según la duración, detecta combinaciones incompatibles y compara el peso **antes/después** mostrando el % ahorrado.
-* **Instalación con consentimiento:** el motor FFmpeg (~32 MB) se descarga solo cuando lo aceptás, con barra de progreso, y queda **en caché** para próximos usos. Botón de **Limpiar caché** siempre visible.
-* **Interfaz Intuitiva:** Arrastra y suelta tus archivos (*Drag & Drop*) en un diseño minimalista y responsive, con **modo claro y oscuro** (respeta la preferencia del sistema, con toggle) e iconos SVG (Lucide).
+- 🔒 **100% Privado y Local:** Todo el procesamiento se realiza en tu navegador vía WebAssembly (`SharedArrayBuffer`). No se suben datos a ningún servidor.
+- 🗜️ **Modo Comprimir:**
+  - Compresión por **nivel de calidad** (CRF).
+  - Compresión apuntando a un **tamaño objetivo en MB** (calcula automáticamente el bitrate según la duración).
+  - Opción para reducir la resolución (1080p, 720p, 480p).
+- 🔄 **Modo Convertir:**
+  - Soporte para formatos de video (**MP4, WebM, MKV, AVI**) y audio (**MP3, WAV, AAC, OGG**).
+  - Opción **Sin pérdida** (*stream-copy* instantáneo) cuando los códecs de origen y destino son compatibles.
+- 🎵 **Modo Extraer Audio:**
+  - Extrae la pista de audio de cualquier video en el formato y bitrate deseado (320 kbps, 192 kbps, 96 kbps).
+- ⚡ **Procesamiento por Lotes (Batch):**
+  - Carga múltiples archivos simultáneamente.
+  - Concurrencia configurable (1 a 3 trabajadores en paralelo).
+  - Nombres de salida personalizables por archivo.
+- 💾 **Instalación y Caché Inteligente:**
+  - El motor de FFmpeg (~32 MB) se descarga una única vez bajo consentimiento.
+  - Almacenamiento en caché del navegador (`Cache Storage`) para uso sin conexión.
+  - Opción visual de "Limpiar caché" disponible en todo momento.
+- 🎨 **Diseño Moderno y Responsivo:**
+  - Interfaz *Swiss minimal* con soporte para modo claro y oscuro.
+  - Soporte de arrastrar y soltar (*Drag & Drop*).
 
-## 🚀 Desarrollo
+---
+
+## 🛠️ Tecnologías Utilizadas
+
+- **Frontend & Build:** [Vite](https://vitejs.dev/) + Vanilla JavaScript + HTML5/CSS3.
+- **Iconos & Tipografía:** [Lucide Icons](https://lucide.dev/) + Inter (`@fontsource-variable/inter`).
+- **Motor Multimedia:** [`@ffmpeg/ffmpeg`](https://ffmpegwasm.netlify.app/) (`FFmpeg.wasm` multihilo `@ffmpeg/core-mt`).
+- **Compatibilidad COOP/COEP:** `coi-serviceworker` para habilitar `SharedArrayBuffer` en sitios estáticos como GitHub Pages.
+- **Gestor de Paquetes:** `pnpm`.
+
+---
+
+## 🚀 Desarrollo Local
+
+### Prerrequisitos
+Asegúrate de tener instalado [Node.js](https://nodejs.org/) (v18+) y [pnpm](https://pnpm.io/).
 
 ```bash
-npm install      # instala dependencias
-npm run dev      # servidor de desarrollo (setea headers COOP/COEP)
-npm run build    # build de producción a dist/
-npm run preview  # sirve el build
-npm test         # tests unitarios (command-builder + validación)
+# 1. Clonar el repositorio
+git clone https://github.com/Joacohbc/ffmpeg-web.git
+cd ffmpeg-web
+
+# 2. Instalar dependencias
+pnpm install
+
+# 3. Iniciar el servidor de desarrollo
+pnpm run dev
+
+# 4. Ejecutar pruebas unitarias
+pnpm test
+
+# 5. Compilar para producción
+pnpm run build
 ```
 
-### Notas técnicas
+---
 
-* Usa el **core multihilo** de FFmpeg.wasm (`@ffmpeg/core-mt`), servido localmente desde `public/ffmpeg/` (build ESM) y cargado vía *blob URLs* para funcionar bajo *cross-origin isolation*.
-* El multihilo requiere `SharedArrayBuffer`, que necesita los headers `Cross-Origin-Opener-Policy` y `Cross-Origin-Embedder-Policy`. En desarrollo los provee Vite; en producción (ej. **GitHub Pages**, que no permite headers personalizados) los habilita [`coi-serviceworker`](https://github.com/gzuidhof/coi-serviceworker).
-* La lógica de construcción de comandos (`src/command-builder.js`) y de validación (`src/validation.js`) son funciones puras testeadas con `node --test`.
+## 🧪 Pruebas Unitarias
+
+El proyecto incluye tests unitarios para la construcción de comandos de FFmpeg y las funciones de validación.
+
+```bash
+pnpm test
+```
+
+---
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia MIT.
